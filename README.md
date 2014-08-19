@@ -28,6 +28,8 @@ current number of allocated objects:        0
 current size of allocated memory:           0 bytes
 ```
 
+After mrb\_close(),
+
  1. "number of malloc calls" and "number of free(!NULL) calls" must be same
     (or some memory was leaked).
  2. "current number of allocated objects" must be 0 (or some memory was leaked).
