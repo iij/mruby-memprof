@@ -182,7 +182,7 @@ main(int argc, char **argv)
   mrbc_context *c;
   mrb_value v;
   extern void memprof_init(mrb_allocf *, void *);
-  extern void memprof_show(mrb_state *);
+  extern void memprof_show(void *);
   mrb_allocf allocf;
   mrb_bool memprof = 0;
   void *ud;
@@ -199,7 +199,7 @@ main(int argc, char **argv)
     if (strcmp("-m", argv[i]) == 0) {
       memprof = 1;
       printf("### Just after mrb_open_allocf():\n");
-      memprof_show(mrb);
+      memprof_show(ud);
       break;
     }
   }
@@ -258,7 +258,7 @@ main(int argc, char **argv)
 
   if (memprof) {
     printf("### Just after mrb_close():\n");
-    memprof_show(mrb);
+    memprof_show(ud);
   }
 
   return n == 0 ? EXIT_SUCCESS : EXIT_FAILURE;

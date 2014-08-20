@@ -8,9 +8,6 @@
 #include "mruby/dump.h"
 #include "mruby/variable.h"
 
-extern void memprof_init(mrb_allocf *, void **);
-extern void memprof_show(mrb_state *);
-
 struct memheader {
   size_t len;      /* size of obj (not including len) */
   union {          /* union for alignment */
@@ -30,6 +27,10 @@ struct memprof_userdata {
   unsigned int current_objcnt;
   unsigned long long current_size;
 };
+
+extern void memprof_init(mrb_allocf *, void **);
+extern void memprof_show(void *);
+
 
 static void *
 memprof_allocf(struct mrb_state *mrb, void *ptr, size_t size, void *ud0)
@@ -94,25 +95,25 @@ memprof_init(mrb_allocf *funp, void **udp)
   *udp  = ud;
 }
 
-static void
-mrb_memprof_check(mrb_state *mrb)
+static mrb_value
+mrb_memprof_show(mrb_state *mrb, mrb_value self)
 {
   if (mrb->allocf != memprof_allocf) {
     mrb_raise(mrb, E_RUNTIME_ERROR, "memory profiling allocator is not installed");
   }
-}
-
-static mrb_value
-mrb_memprof_show(mrb_state *mrb, mrb_value self)
-{
-  struct memprof_userdata *ud;
 
 #if MRUBY_RELEASE_NO < 10000
-  ud = mrb->ud;
+  memprof_show(mrb->ud);
 #else
-  ud = mrb->allocf_ud;
+  memprof_show(mrb->allocf_ud);
 #endif
-  mrb_memprof_check(mrb);
+  return mrb_nil_value();
+}
+
+void
+memprof_show(void *ptr)
+{
+  const struct memprof_userdata *ud = ptr;
   printf("number of malloc calls:              %8u\n", ud->malloc_cnt);
   printf("number of realloc calls:             %8u\n", ud->realloc_cnt);
   printf("number of free calls:                %8u\n", ud->free_cnt);
@@ -124,14 +125,6 @@ mrb_memprof_show(mrb_state *mrb, mrb_value self)
   printf("current size of allocated memory:%12llu bytes\n", ud->current_size);
   printf("\n");
   fflush(stdout);
-  return mrb_nil_value();
-}
-
-void
-memprof_show(mrb_state *mrb)
-{
-  /* Note: memprof_show does not use 2nd argument at all. */
-  mrb_memprof_show(mrb, mrb_nil_value());
 }
 
 void
