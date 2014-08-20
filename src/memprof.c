@@ -105,7 +105,13 @@ mrb_memprof_check(mrb_state *mrb)
 static mrb_value
 mrb_memprof_show(mrb_state *mrb, mrb_value self)
 {
-  struct memprof_userdata *ud = mrb->allocf_ud;
+  struct memprof_userdata *ud;
+
+#if MRUBY_RELEASE_NO < 10000
+  ud = mrb->ud;
+#else
+  ud = mrb->allocf_ud;
+#endif
   mrb_memprof_check(mrb);
   printf("number of malloc calls:              %8u\n", ud->malloc_cnt);
   printf("number of realloc calls:             %8u\n", ud->realloc_cnt);

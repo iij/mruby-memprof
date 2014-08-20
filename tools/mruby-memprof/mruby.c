@@ -240,7 +240,7 @@ main(int argc, char **argv)
     }
     else {
       mrbc_filename(mrb, c, "-e");
-      mrb_gv_set(mrb, zero_sym, mrb_str_new_lit(mrb, "-e"));
+      mrb_gv_set(mrb, zero_sym, mrb_str_new_cstr(mrb, "-e"));
       v = mrb_load_string_cxt(mrb, args.cmdline, c);
     }
   }
