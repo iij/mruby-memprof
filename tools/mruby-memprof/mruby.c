@@ -6,6 +6,7 @@
 #include "mruby/compile.h"
 #include "mruby/dump.h"
 #include "mruby/variable.h"
+#include "mruby/string.h"
 
 #ifndef ENABLE_STDIO
 static void
